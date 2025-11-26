@@ -1,247 +1,166 @@
-# 📊 Smart Task Analyzer
+# 🚀 Smart Task Analyzer
 
-**Internship Assignment Project**
-
-A **full-stack Task Prioritization System** based on multi-factor decision scoring. Users can enter tasks in a React frontend, and the **Django REST API calculates priority scores** using urgency, importance, estimated effort, and dependency impact. The system ranks tasks and provides **priority-based recommendations**, making planning smarter and more efficient for individuals and teams.
+A Django-based API and React frontend system that intelligently prioritizes tasks using urgency, importance, effort, and dependency analysis.
 
 ---
 
-## 🚀 Project Features
+## 📦 Setup Instructions
 
-### 🔹 Frontend (React)
+### 🔧 Backend (Django API)
 
-✔ Interactive UI to add tasks dynamically
-✔ Input: Title, Due Date, Effort (hours), Importance (1–10)
-✔ Live visual task display
-✔ Button to analyze tasks via backend API
-✔ “Backend API Connected” status indicator
-✔ Real-time prioritized ranking display
+1. Navigate to backend folder:
 
----
+   ```bash
+   cd backend
+   ```
 
-### 🔹 Backend (Django REST API)
+2. Create and activate virtual environment:
 
-✔ `/api/prioritize/` endpoint accepts list of tasks
-✔ Calculates priority score using **custom weighted scoring algorithm**
-✔ Handles urgency, importance, effort, circular dependencies, and dependency impact
-✔ Returns **sorted ranked list of tasks with priority score**
-✔ Supports **balanced, high-impact, fastest-wins, and deadline-driven profiles**
-✔ Includes **unit tests** for scoring logic
+   ```bash
+   python -m venv venv
+   venv\Scripts\activate
+   ```
 
----
+3. Install dependencies:
 
-### 🧠 Scoring Algorithm
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-Each task is evaluated using four main factors:
+4. Run Django server:
 
-| Factor              | Logic                                     |
-| ------------------- | ----------------------------------------- |
-| Urgency             | Earlier or overdue tasks get higher score |
-| Importance          | User-rated importance (1–10)              |
-| Effort              | Less effort → higher priority             |
-| Dependency Impact   | Tasks blocking others get a boost         |
-| Circular Dependency | If detected → penalty applied             |
+   ```bash
+   python manage.py runserver
+   ```
 
-Final Score:
-
-```
-Priority Score = 
-(w_urgency × urgency) +
-(w_importance × importance) +
-(w_effort × effort) +
-(w_dependencies × dependency_score)
-```
-
-Weight profiles:
-
-| Profile         | Urgency | Importance | Effort | Dependencies |
-| --------------- | ------- | ---------- | ------ | ------------ |
-| Balanced        | 0.30    | 0.30       | 0.20   | 0.20         |
-| High Impact     | 0.20    | 0.50       | 0.10   | 0.20         |
-| Fastest Wins    | 0.15    | 0.15       | 0.50   | 0.20         |
-| Deadline Driven | 0.60    | 0.20       | 0.10   | 0.10         |
+Backend will run at 👉 `http://127.0.0.1:8000/`
 
 ---
 
-## 🛠 Tech Stack
+### 🎨 Frontend (React)
 
-| Component             | Technology                     |
-| --------------------- | ------------------------------ |
-| Frontend              | React (JavaScript, HTML, CSS)  |
-| Backend               | Django + Django REST Framework |
-| Styling               | Tailwind / Basic CSS           |
-| API Testing           | Postman                        |
-| Unit Testing          | Django TestCase                |
-| Dependency Management | `pip`, `requirements.txt`      |
-| Version Control       | Git & GitHub                   |
+1. Open a new terminal and navigate to frontend folder:
 
----
+   ```bash
+   cd frontend
+   ```
 
-## 📂 Project Structure
+2. Install frontend dependencies:
 
-```
-Smart Task Analyzer/
-│── backend/
-│   ├── tasks/
-│   │   ├── views.py
-│   │   ├── scoring.py
-│   │   ├── tests.py
-│   │   ├── urls.py
-│   ├── manage.py
-│   ├── requirements.txt
-│   ├── settings.py
-│
-│── frontend/
-│   ├── src/
-│   │   ├── TaskAnalyzer.jsx
-│   │   ├── App.js
-│   │   ├── index.js
-│   ├── package.json
-│
-│── README.md
-│── .gitignore
-```
+   ```bash
+   npm install
+   ```
+
+3. Start frontend:
+
+   ```bash
+   npm start
+   ```
+
+Frontend runs at 👉 `http://localhost:3000/`
 
 ---
 
-# 🌐 API Usage Guide
+## 🧠 Algorithm Explanation (Priority Scoring)
 
-### 🎯 Endpoint
+The priority scoring algorithm analyzes tasks based on **four major factors**:
+**Urgency**, **Importance**, **Effort**, and **Dependencies**. It assigns a score between **0 and 100** for each task.
 
-```
-POST http://127.0.0.1:8000/api/prioritize/
-```
+### 1️⃣ Urgency (How soon is the deadline?)
 
-### ▶ Request Body
+Tasks with nearer or overdue deadlines are assigned higher priority.
 
-```json
-[
-  {
-    "id": 1,
-    "title": "Complete Assignment",
-    "due_date": "2025-01-05",
-    "estimated_hours": 3,
-    "importance": 8,
-    "dependencies": []
-  },
-  {
-    "id": 2,
-    "title": "Study for Exam",
-    "due_date": "2024-12-10",
-    "estimated_hours": 5,
-    "importance": 9,
-    "dependencies": []
-  }
-]
+* If the task is **overdue**, it receives a strong penalty boost.
+* If due soon, its priority gradually increases.
+
+**Formula:**
+
+> If overdue → `1 + abs(days overdue) × 0.15`
+> If upcoming → `1 / (1 + days remaining)`
+
+---
+
+### 2️⃣ Importance (How valuable is the task?)
+
+Importance is rated from **1 to 10** by the user.
+It is normalized: `importance / 10`.
+
+---
+
+### 3️⃣ Effort (How long will it take?)
+
+Tasks requiring fewer estimated hours are prioritized.
+
+> Formula: `1 - min(hours / 40, 1)`
+
+---
+
+### 4️⃣ Dependencies (Does this task block others?)
+
+If a task is required to complete other tasks, its priority increases.
+However, **circular dependencies** receive a 0 score.
+
+---
+
+### 🧮 Total Score Calculation
+
+```python
+score = (urgency * weight_urgency) +
+        (importance * weight_importance) +
+        (effort * weight_effort) +
+        (dependencies * weight_dependencies)
 ```
 
-### ✔ Response Format
+Each scoring factor is then multiplied by 100 and sorted in descending order.
 
-```json
-[
-  {
-    "id": 2,
-    "title": "Study for Exam",
-    "priority_score": 92.5
-  },
-  {
-    "id": 1,
-    "title": "Complete Assignment",
-    "priority_score": 75.3
-  }
-]
-```
+This makes the system **dynamic**, **scalable**, and suitable for real-time task planning.
 
 ---
 
-# ⚙ Installation and Setup
+## ⚙️ Design Decisions & Trade-offs
 
-## 1️⃣ Backend Setup (Django)
-
-```bash
-cd backend
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
-```
-
-Server runs at:
-👉 [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
+| Decision                         | Reason                                         |
+| -------------------------------- | ---------------------------------------------- |
+| Used Django REST Framework       | Quick API development, easy JSON handling      |
+| React for Frontend               | Live task updates & better user interaction    |
+| Chose JSON for API communication | Lightweight, frontend-friendly                 |
+| Used local fallback scoring      | Ensures frontend still works without backend   |
+| Simplified weight profiles       | Enough for initial MVP, but scalable later     |
+| No database storage              | Requirement focused on processing, not storage |
 
 ---
 
-## 2️⃣ Frontend Setup (React)
+## ⏱ Time Breakdown
 
-```bash
-cd frontend
-npm install
-npm start
-```
-
-Frontend runs at:
-👉 [http://localhost:3000/](http://localhost:3000/)
-
----
-
-# 🧪 Unit Testing
-
-File: `backend/tasks/tests.py`
-
-Run tests:
-
-```bash
-cd backend
-venv\Scripts\activate
-python manage.py test
-```
-
-✔ Tests cover:
-
-* Score calculation
-* Overdue priority logic
-* Circular dependency detection
-* Profile-based scoring change
+| Task                                    | Time Spent     |
+| --------------------------------------- | -------------- |
+| Understanding PDF requirements          | 2 hours        |
+| Backend API development & scoring logic | 4.5 hours      |
+| Frontend UI with React and Tailwind     | 4 hours        |
+| API integration & bug fixing            | 2 hours        |
+| Writing unit tests                      | 1 hour         |
+| Git + README documentation              | 1 hour         |
+| Total                                   | **14.5 hours** |
 
 ---
 
-# 📦 GitHub Submission Requirements Checklist
+## 🧪 Unit Tests Implemented
 
-| Requirement          | Status |
-| -------------------- | ------ |
-| Django backend code  | ✔      |
-| React frontend code  | ✔      |
-| requirements.txt     | ✔      |
-| README.md            | ✔      |
-| Minimum 3 unit tests | ✔      |
-| Clean commit history | ✔      |
+✔ Score is always between 0 and 100
+✔ Overdue tasks receive higher priority
+✔ Circular dependencies receive penalty
+✔ High importance tasks get prioritized in high-impact mode
 
 ---
 
-# 🌟 Future Enhancements
+## 🚀 Future Improvements
 
-| Feature                   | Benefit                     |
-| ------------------------- | --------------------------- |
-| User Authentication       | Personal task storage       |
-| Database Integration      | Save tasks permanently      |
-| AI-based task suggestions | Smarter productivity        |
-| Dashboard with charts     | Visual performance analysis |
-| Mobile App version        | Anywhere productivity       |
-
----
-
-# ✨ Final Notes
-
-🔹 This project implements both **API-based backend logic and real-time frontend interaction**
-🔹 Shows understanding of **algorithms, REST APIs, React UI, and Django backend**
-🔹 Includes **unit testing, proper Git structure, and deployment readiness**
-
----
+🔹 Add user login and database storage
+🔹 Enable task editing and deletion
+🔹 Add Gantt-style task scheduling
+🔹 Export priority results as PDF/Excel
+🔹 Implement drag-and-drop task sorting
 
 ## 💡 Developed By
-
-**Ashish Chauhan**
-
-
-
+Ashish Chauhan
+chauhan.ashish250204@gmail.com

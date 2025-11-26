@@ -134,13 +134,13 @@ This makes the system **dynamic**, **scalable**, and suitable for real-time task
 
 | Task                                    | Time Spent     |
 | --------------------------------------- | -------------- |
-| Understanding PDF requirements          | 2 hours        |
-| Backend API development & scoring logic | 4.5 hours      |
-| Frontend UI with React and Tailwind     | 4 hours        |
-| API integration & bug fixing            | 2 hours        |
+| Understanding PDF requirements          | 1 hours        |
+| Backend API development & scoring logic | 3.5 hours      |
+| Frontend UI with React and Tailwind     | 2 hours        |
+| API integration & bug fixing            | 1 hours        |
 | Writing unit tests                      | 1 hour         |
-| Git + README documentation              | 1 hour         |
-| Total                                   | **14.5 hours** |
+| Git + README documentation              | 0.5 hour       |
+| Total                                   | **9 hours**    |
 
 ---
 
